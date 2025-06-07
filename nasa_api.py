@@ -1,18 +1,20 @@
+from flask import Flask, render_template_string
 import requests
-import webbrowser
-import os
 
-api_key = "M73dO4B5zrmj9QeLBfUxgkOFysf4dqcKa8MAAsmI"
-url = "https://api.nasa.gov/planetary/apod?api_key=" + api_key
-response = requests.get(url)
-data = response.json()
-print("API Response:", data)
-date = data.get("date", "No date available.")
-title = data.get("title", "No title available.")
-explanation = data.get("explanation", "No explanation available.")
-image_url = data.get("url", "")
+app = Flask(__name__)
 
-html_content = f"""
+@app.route("/")
+def nasa():
+    api_key = "M73dO4B5zrmj9QeLBfUxgkOFysf4dqcKa8MAAsmI"
+    url = "https://api.nasa.gov/planetary/apod?api_key=" + api_key
+    response = requests.get(url)
+    data = response.json()
+    print("API Response:", data)
+    date = data.get("date", "No date available.")
+    title = data.get("title", "No title available.")
+    explanation = data.get("explanation", "No explanation available.")
+    image_url = data.get("url", "")
+    html_content = f"""
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,8 +31,7 @@ html_content = f"""
   </body>
 </html>
 """
+    return render_template_string(html_content)
 
-with open('index.html', 'w', encoding='utf-8') as file:
-    file.write(html_content)
-
-webbrowser.open(f"file://{os.path.abspath('index.html')}")
+if __name__ == "__main__":
+    app.run(debug=True)
